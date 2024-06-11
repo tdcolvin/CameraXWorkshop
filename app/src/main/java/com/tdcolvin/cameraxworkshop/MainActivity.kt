@@ -1,6 +1,9 @@
 package com.tdcolvin.cameraxworkshop
 
 import android.Manifest
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -8,10 +11,11 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.content.FileProvider
+import androidx.core.net.toFile
 import com.tdcolvin.cameraxworkshop.ui.permission.WithPermission
 import com.tdcolvin.cameraxworkshop.ui.theme.CameraXWorkshopTheme
 
@@ -41,8 +45,18 @@ fun CameraAppScreen() {
 
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
+fun CameraScreenPreview() {
     CameraXWorkshopTheme {
         CameraAppScreen()
     }
+}
+
+fun Uri.shareAsImage(context: Context) {
+    val contentUri = FileProvider.getUriForFile(context, "com.tdcolvin.cameraxworkshop.fileprovider", toFile())
+    val shareIntent: Intent = Intent().apply {
+        action = Intent.ACTION_SEND
+        putExtra(Intent.EXTRA_STREAM, contentUri)
+        type = "image/jpeg"
+    }
+    context.startActivity(Intent.createChooser(shareIntent, null))
 }
