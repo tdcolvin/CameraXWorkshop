@@ -8,12 +8,15 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.FileProvider
 import androidx.core.net.toFile
 import com.tdcolvin.cameraxworkshop.ui.permission.WithPermission
@@ -40,7 +43,16 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun CameraAppScreen() {
+    val previewUseCase = remember { androidx.camera.core.Preview.Builder().build() }
 
+    AndroidView(
+        modifier = Modifier.fillMaxSize(),
+        factory = { context ->
+            PreviewView(context).also {
+                previewUseCase.setSurfaceProvider(it.surfaceProvider)
+            }
+        }
+    )
 }
 
 @Preview(showBackground = true)
