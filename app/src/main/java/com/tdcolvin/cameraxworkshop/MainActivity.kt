@@ -11,6 +11,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.camera.core.CameraSelector
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -20,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
@@ -52,6 +55,17 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun CameraAppScreen() {
+    Box {
+       CameraPreview()
+
+       Column(modifier = Modifier.align(Alignment.BottomCenter)) {
+
+       }
+    }
+}
+
+@Composable
+fun CameraPreview() {
     val previewUseCase = remember { androidx.camera.core.Preview.Builder().build() }
 
     var cameraProvider by remember { mutableStateOf<ProcessCameraProvider?>(null) }
