@@ -8,6 +8,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.camera.core.CameraSelector
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,6 +27,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.net.toFile
+import androidx.lifecycle.LifecycleOwner
 import com.tdcolvin.cameraxworkshop.ui.permission.WithPermission
 import com.tdcolvin.cameraxworkshop.ui.theme.CameraXWorkshopTheme
 
@@ -56,10 +58,20 @@ fun CameraAppScreen() {
 
     val localContext = LocalContext.current
 
+    fun rebindCameraProvider() {
+        cameraProvider?.let { cameraProvider ->
+            val cameraSelector = CameraSelector.Builder()
+                .requireLensFacing(CameraSelector.LENS_FACING_FRONT)
+                .build()
+            cameraProvider.bindToLifecycle(localContext as LifecycleOwner, cameraSelector, previewUseCase)
+        }
+    }
+
     LaunchedEffect(Unit) {
         val providerFuture = ProcessCameraProvider.getInstance(localContext)
         providerFuture.addListener({
             cameraProvider = providerFuture.get()
+            rebindCameraProvider()
         }, ContextCompat.getMainExecutor(localContext))
     }
 
@@ -68,6 +80,7 @@ fun CameraAppScreen() {
         factory = { context ->
             PreviewView(context).also {
                 previewUseCase.setSurfaceProvider(it.surfaceProvider)
+                rebindCameraProvider()
             }
         }
     )
