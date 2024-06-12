@@ -75,6 +75,18 @@ fun CameraAppScreen() {
                     Text("Back camera")
                 }
             }
+
+           Row {
+               Button(onClick = {}) {
+                   Text("Zoom 0.0")
+               }
+               Button(onClick = {}) {
+                   Text("Zoom 0.5")
+               }
+               Button(onClick = {}) {
+                   Text("Zoom 1.0")
+               }
+           }
        }
     }
 }
