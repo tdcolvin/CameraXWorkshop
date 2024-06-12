@@ -10,6 +10,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.camera.core.CameraControl
 import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageCapture
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.Box
@@ -63,11 +64,13 @@ class MainActivity : ComponentActivity() {
 fun CameraAppScreen() {
     var lensFacing by remember { mutableIntStateOf(CameraSelector.LENS_FACING_FRONT) }
     var zoomLevel by remember { mutableFloatStateOf(0.0f) }
+    val imageCaptureUseCase = remember { ImageCapture.Builder().build() }
 
     Box {
        CameraPreview(
            lensFacing = lensFacing,
-           zoomLevel = zoomLevel
+           zoomLevel = zoomLevel,
+           imageCaptureUseCase = imageCaptureUseCase
        )
 
        Column(modifier = Modifier.align(Alignment.BottomCenter)) {
@@ -98,7 +101,8 @@ fun CameraAppScreen() {
 @Composable
 fun CameraPreview(
     lensFacing: Int,
-    zoomLevel: Float
+    zoomLevel: Float,
+    imageCaptureUseCase: ImageCapture
 ) {
     val previewUseCase = remember { androidx.camera.core.Preview.Builder().build() }
 
@@ -113,7 +117,11 @@ fun CameraPreview(
                 .requireLensFacing(lensFacing)
                 .build()
             cameraProvider.unbindAll()
-            val camera = cameraProvider.bindToLifecycle(localContext as LifecycleOwner, cameraSelector, previewUseCase)
+            val camera = cameraProvider.bindToLifecycle(
+                localContext as LifecycleOwner,
+                cameraSelector,
+                previewUseCase, imageCaptureUseCase
+            )
             cameraControl = camera.cameraControl
         }
     }
