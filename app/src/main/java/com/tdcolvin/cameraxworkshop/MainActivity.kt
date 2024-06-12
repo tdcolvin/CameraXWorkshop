@@ -13,12 +13,16 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -55,17 +59,30 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun CameraAppScreen() {
+    var lensFacing by remember { mutableIntStateOf(CameraSelector.LENS_FACING_FRONT) }
+
     Box {
-       CameraPreview()
+       CameraPreview(
+           lensFacing = lensFacing
+       )
 
        Column(modifier = Modifier.align(Alignment.BottomCenter)) {
-
+            Row {
+                Button(onClick = { lensFacing = CameraSelector.LENS_FACING_FRONT }) {
+                    Text("Front camera")
+                }
+                Button(onClick = { lensFacing = CameraSelector.LENS_FACING_BACK }) {
+                    Text("Back camera")
+                }
+            }
        }
     }
 }
 
 @Composable
-fun CameraPreview() {
+fun CameraPreview(
+    lensFacing: Int
+) {
     val previewUseCase = remember { androidx.camera.core.Preview.Builder().build() }
 
     var cameraProvider by remember { mutableStateOf<ProcessCameraProvider?>(null) }
@@ -75,8 +92,9 @@ fun CameraPreview() {
     fun rebindCameraProvider() {
         cameraProvider?.let { cameraProvider ->
             val cameraSelector = CameraSelector.Builder()
-                .requireLensFacing(CameraSelector.LENS_FACING_FRONT)
+                .requireLensFacing(lensFacing)
                 .build()
+            cameraProvider.unbindAll()
             cameraProvider.bindToLifecycle(localContext as LifecycleOwner, cameraSelector, previewUseCase)
         }
     }
@@ -87,6 +105,10 @@ fun CameraPreview() {
             cameraProvider = providerFuture.get()
             rebindCameraProvider()
         }, ContextCompat.getMainExecutor(localContext))
+    }
+
+    LaunchedEffect(lensFacing) {
+        rebindCameraProvider()
     }
 
     AndroidView(
