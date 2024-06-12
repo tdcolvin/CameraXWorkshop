@@ -3,6 +3,7 @@ package com.tdcolvin.cameraxworkshop
 import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.media.Image
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -11,6 +12,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.camera.core.CameraControl
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
+import androidx.camera.core.ImageCaptureException
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.Box
@@ -40,6 +42,7 @@ import androidx.core.net.toFile
 import androidx.lifecycle.LifecycleOwner
 import com.tdcolvin.cameraxworkshop.ui.permission.WithPermission
 import com.tdcolvin.cameraxworkshop.ui.theme.CameraXWorkshopTheme
+import java.io.File
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,6 +68,8 @@ fun CameraAppScreen() {
     var lensFacing by remember { mutableIntStateOf(CameraSelector.LENS_FACING_FRONT) }
     var zoomLevel by remember { mutableFloatStateOf(0.0f) }
     val imageCaptureUseCase = remember { ImageCapture.Builder().build() }
+
+    val localContext = LocalContext.current
 
     Box {
        CameraPreview(
@@ -95,7 +100,19 @@ fun CameraAppScreen() {
                }
            }
 
-           Button(onClick = {}) {
+           Button(onClick = {
+               val outputFileOptions = ImageCapture.OutputFileOptions.Builder(File(localContext.externalCacheDir, "image.jpg"))
+                   .build()
+               val callback = object: ImageCapture.OnImageSavedCallback {
+                   override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
+                       outputFileResults.savedUri?.shareAsImage(localContext)
+                   }
+
+                   override fun onError(exception: ImageCaptureException) {
+                   }
+               }
+               imageCaptureUseCase.takePicture(outputFileOptions, ContextCompat.getMainExecutor(localContext), callback)
+           }) {
                Text("Take Photo")
            }
        }
