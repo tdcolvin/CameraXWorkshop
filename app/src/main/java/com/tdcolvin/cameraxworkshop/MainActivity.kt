@@ -8,15 +8,22 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.net.toFile
 import com.tdcolvin.cameraxworkshop.ui.permission.WithPermission
@@ -44,6 +51,17 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun CameraAppScreen() {
     val previewUseCase = remember { androidx.camera.core.Preview.Builder().build() }
+
+    var cameraProvider by remember { mutableStateOf<ProcessCameraProvider?>(null) }
+
+    val localContext = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        val providerFuture = ProcessCameraProvider.getInstance(localContext)
+        providerFuture.addListener({
+            cameraProvider = providerFuture.get()
+        }, ContextCompat.getMainExecutor(localContext))
+    }
 
     AndroidView(
         modifier = Modifier.fillMaxSize(),
