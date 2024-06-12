@@ -94,6 +94,10 @@ fun CameraAppScreen() {
                    Text("Zoom 1.0")
                }
            }
+
+           Button(onClick = {}) {
+               Text("Take Photo")
+           }
        }
     }
 }
