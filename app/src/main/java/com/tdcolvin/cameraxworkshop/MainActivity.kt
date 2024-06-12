@@ -8,6 +8,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.camera.core.CameraControl
 import androidx.camera.core.CameraSelector
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
@@ -22,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,10 +62,12 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun CameraAppScreen() {
     var lensFacing by remember { mutableIntStateOf(CameraSelector.LENS_FACING_FRONT) }
+    var zoomLevel by remember { mutableFloatStateOf(0.0f) }
 
     Box {
        CameraPreview(
-           lensFacing = lensFacing
+           lensFacing = lensFacing,
+           zoomLevel = zoomLevel
        )
 
        Column(modifier = Modifier.align(Alignment.BottomCenter)) {
@@ -77,13 +81,13 @@ fun CameraAppScreen() {
             }
 
            Row {
-               Button(onClick = {}) {
+               Button(onClick = { zoomLevel = 0.0f }) {
                    Text("Zoom 0.0")
                }
-               Button(onClick = {}) {
+               Button(onClick = { zoomLevel = 0.5f }) {
                    Text("Zoom 0.5")
                }
-               Button(onClick = {}) {
+               Button(onClick = { zoomLevel = 1.0f }) {
                    Text("Zoom 1.0")
                }
            }
@@ -93,11 +97,13 @@ fun CameraAppScreen() {
 
 @Composable
 fun CameraPreview(
-    lensFacing: Int
+    lensFacing: Int,
+    zoomLevel: Float
 ) {
     val previewUseCase = remember { androidx.camera.core.Preview.Builder().build() }
 
     var cameraProvider by remember { mutableStateOf<ProcessCameraProvider?>(null) }
+    var cameraControl by remember { mutableStateOf<CameraControl?>(null) }
 
     val localContext = LocalContext.current
 
@@ -107,7 +113,8 @@ fun CameraPreview(
                 .requireLensFacing(lensFacing)
                 .build()
             cameraProvider.unbindAll()
-            cameraProvider.bindToLifecycle(localContext as LifecycleOwner, cameraSelector, previewUseCase)
+            val camera = cameraProvider.bindToLifecycle(localContext as LifecycleOwner, cameraSelector, previewUseCase)
+            cameraControl = camera.cameraControl
         }
     }
 
@@ -121,6 +128,10 @@ fun CameraPreview(
 
     LaunchedEffect(lensFacing) {
         rebindCameraProvider()
+    }
+
+    LaunchedEffect(zoomLevel) {
+        cameraControl?.setLinearZoom(zoomLevel)
     }
 
     AndroidView(
