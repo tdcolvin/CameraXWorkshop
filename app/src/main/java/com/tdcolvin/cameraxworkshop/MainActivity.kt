@@ -9,6 +9,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.camera.core.CameraSelector
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.FileProvider
 import androidx.core.net.toFile
@@ -48,7 +50,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun CameraAppScreen() {
     Box(modifier = Modifier.fillMaxSize()) {
-        //add the preview view here
+        CameraPreview(modifier = Modifier.fillMaxSize())
 
         ControlButtons(
             modifier = Modifier.align(Alignment.BottomCenter),
@@ -57,6 +59,12 @@ fun CameraAppScreen() {
             onCapture = { }
         )
     }
+}
+
+@Composable
+fun CameraPreview(modifier: Modifier = Modifier) {
+    //TODO: add the preview view here
+
 }
 
 @Composable
