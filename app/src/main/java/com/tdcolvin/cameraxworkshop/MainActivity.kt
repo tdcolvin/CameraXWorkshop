@@ -3,7 +3,6 @@ package com.tdcolvin.cameraxworkshop
 import android.Manifest
 import android.content.Context
 import android.content.Intent
-import android.media.Image
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -14,6 +13,7 @@ import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.lifecycle.awaitInstance
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -149,11 +149,8 @@ fun CameraPreview(
     }
 
     LaunchedEffect(Unit) {
-        val providerFuture = ProcessCameraProvider.getInstance(localContext)
-        providerFuture.addListener({
-            cameraProvider = providerFuture.get()
-            rebindCameraProvider()
-        }, ContextCompat.getMainExecutor(localContext))
+        cameraProvider = ProcessCameraProvider.awaitInstance(localContext)
+        rebindCameraProvider()
     }
 
     LaunchedEffect(lensFacing) {
@@ -168,7 +165,7 @@ fun CameraPreview(
         modifier = modifier.fillMaxSize(),
         factory = { context ->
             PreviewView(context).also {
-                previewUseCase.setSurfaceProvider(it.surfaceProvider)
+                previewUseCase.surfaceProvider = it.surfaceProvider
                 rebindCameraProvider()
             }
         }
