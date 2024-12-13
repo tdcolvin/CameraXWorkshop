@@ -69,7 +69,12 @@ fun CameraAppScreen() {
             modifier = Modifier.align(Alignment.BottomCenter),
             onZoom = { newZoomLevel -> zoomLevel = newZoomLevel },
             onSelectCamera = { newLensFacing -> lensFacing = newLensFacing },
-            onCapture = { }
+            onCapture = {
+                /*
+                    TODO
+                    Take a photo using the imageCaptureUseCase above.
+                */
+            }
         )
     }
 }
