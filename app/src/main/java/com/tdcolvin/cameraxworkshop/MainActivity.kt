@@ -121,6 +121,7 @@ fun CameraAppScreen() {
 
 @Composable
 fun CameraPreview(
+    modifier: Modifier = Modifier,
     lensFacing: Int,
     zoomLevel: Float,
     imageCaptureUseCase: ImageCapture
@@ -164,7 +165,7 @@ fun CameraPreview(
     }
 
     AndroidView(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         factory = { context ->
             PreviewView(context).also {
                 previewUseCase.setSurfaceProvider(it.surfaceProvider)
